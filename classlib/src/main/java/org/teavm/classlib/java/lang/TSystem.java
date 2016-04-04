@@ -19,17 +19,18 @@ import org.teavm.classlib.java.io.TConsole;
 import org.teavm.classlib.java.io.TInputStream;
 import org.teavm.classlib.java.io.TPrintStream;
 import org.teavm.classlib.java.lang.reflect.TArray;
+import org.teavm.classlib.java.util.TProperties;
 import org.teavm.dependency.PluggableDependency;
 import org.teavm.javascript.spi.GeneratedBy;
 
 /**
- *
  * @author Alexey Andreev
  */
 public final class TSystem extends TObject {
     public static final TPrintStream out = new TPrintStream(new TConsoleOutputStreamStdout(), false);
     public static final TPrintStream err = new TPrintStream(new TConsoleOutputStreamStderr(), false);
     public static final TInputStream in = new TConsoleInputStream();
+    private static final TProperties properties = new TProperties();
 
     private TSystem() {
     }
@@ -79,8 +80,18 @@ public final class TSystem extends TObject {
     @GeneratedBy(SystemNativeGenerator.class)
     public static native long currentTimeMillis();
 
+    public static TProperties getProperties() {
+        return properties;
+    }
+
     public static TString getProperty(@SuppressWarnings("unused") TString key) {
-        // TODO: make implementation
+        try {
+            Object ret = properties.get(key);
+            if (ret != null) {
+                return new TString(ret.toString().toCharArray());
+            }
+        } catch (TError ignored) {
+        }
         return null;
     }
 
