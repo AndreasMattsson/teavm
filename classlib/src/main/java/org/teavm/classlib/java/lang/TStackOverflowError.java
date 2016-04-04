@@ -21,15 +21,15 @@ import java.io.Serializable;
  *
  * @author Alexey Andreev
  */
-public class TSTackOverflowError extends TVirtualMachineError {
+public class TStackOverflowError extends TVirtualMachineError {
 
     private static final long serialVersionUID = -645746457262633950L;
 
-    public TSTackOverflowError() {
+    public TStackOverflowError() {
         super();
     }
 
-    public TSTackOverflowError(TString message) {
+    public TStackOverflowError(TString message) {
         super(message);
     }
 }
