@@ -487,8 +487,10 @@ public class TeaVM implements TeaVMHost, ServiceRepository {
             }
             sourceWriter.append("\"use strict\";").newLine();
             renderer.renderRuntime();
+            sourceWriter.append("//end of renderRuntime").newLine();
             cacheActiveFlag.set(true);
             renderer.render(clsNodes);
+            sourceWriter.append("//renderStringPool()").newLine();
             renderer.renderStringPool();
             sourceWriter.append(cacheBuilder.toString()).newLine();
             cacheBuilder.setLength(0);
