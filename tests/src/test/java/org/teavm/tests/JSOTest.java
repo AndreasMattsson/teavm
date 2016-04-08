@@ -17,6 +17,7 @@ package org.teavm.tests;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import java.io.StringWriter;
 import java.util.List;
 import org.junit.Test;
 import org.teavm.diagnostics.Problem;
@@ -100,7 +101,7 @@ public class JSOTest {
         TeaVM vm = new TeaVMBuilder().build();
         vm.installPlugins();
         vm.entryPoint("test", new MethodReference(JSOTest.class, methodName, void.class));
-        vm.build(new StringBuilder(), null);
+        vm.build(new StringWriter(), null);
         return vm.getProblemProvider().getSevereProblems();
     }
 }
