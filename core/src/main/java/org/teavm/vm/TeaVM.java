@@ -17,6 +17,7 @@ package org.teavm.vm;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.teavm.cache.NoCache;
 import org.teavm.codegen.*;
 import org.teavm.common.ServiceRepository;
@@ -348,7 +349,7 @@ public class TeaVM implements TeaVMHost, ServiceRepository {
      *
      * @throws RenderingException when something went wrong during rendering phase.
      */
-    public void build(Appendable writer, BuildTarget target) throws RenderingException {
+    public void build(Writer writer, BuildTarget target) throws RenderingException {
         // Check dependencies
         reportPhase(TeaVMPhase.DEPENDENCY_CHECKING, 1);
         if (wasCancelled()) {
@@ -422,7 +423,40 @@ public class TeaVM implements TeaVMHost, ServiceRepository {
         naming.setMinifying(minifying);
         SourceWriterBuilder builder = new SourceWriterBuilder(naming);
         builder.setMinified(minifying);
-        SourceWriter sourceWriter = builder.build(writer);
+
+        final AtomicBoolean cacheActiveFlag = new AtomicBoolean(false);
+        StringBuilder cacheBuilder = new StringBuilder();
+        Appendable cachingWriter = new FilterWriter(writer) {
+
+            @Override
+            public void write(int c) throws IOException {
+                if (!cacheActiveFlag.get()) {
+                    super.write(c);
+                } else {
+                    cacheBuilder.append(c);
+                }
+            }
+
+            @Override
+            public void write(char[] cbuf, int off, int len) throws IOException {
+                if(!cacheActiveFlag.get()) {
+                    super.write(cbuf, off, len);
+                } else {
+                    cacheBuilder.append(cbuf, off, len);
+                }
+            }
+
+            @Override
+            public void write(String str, int off, int len) throws IOException {
+                if(!cacheActiveFlag.get()) {
+                    super.write(str, off, len);
+                } else {
+                    cacheBuilder.append(str, off, len);
+                }
+            }
+        };
+
+        SourceWriter sourceWriter = builder.build(cachingWriter);
         Renderer renderer = new Renderer(sourceWriter, classSet, classLoader, this, asyncMethods, asyncFamilyMethods,
                 diagnostics);
         renderer.setProperties(properties);
@@ -453,8 +487,12 @@ public class TeaVM implements TeaVMHost, ServiceRepository {
             }
             sourceWriter.append("\"use strict\";").newLine();
             renderer.renderRuntime();
+            cacheActiveFlag.set(true);
             renderer.render(clsNodes);
             renderer.renderStringPool();
+            sourceWriter.append(cacheBuilder.toString()).newLine();
+            cacheBuilder.setLength(0);
+            cacheActiveFlag.set(false);
             for (Map.Entry<String, TeaVMEntryPoint> entry : entryPoints.entrySet()) {
                 sourceWriter.append("var ").append(entry.getKey()).ws().append("=").ws();
                 MethodReference ref = entry.getValue().reference;
