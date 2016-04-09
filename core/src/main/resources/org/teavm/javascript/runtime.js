@@ -434,15 +434,25 @@ function $rt_mainStarter(f) {
         $rt_threadStarter(f)(javaArgs);
     };
 }
+var $rt_stringPool_args;
 var $rt_stringPool_instance;
+function $rt_stringPoolArgs(strings) {
+    $rt_stringPool_args = strings;
+}
 function $rt_stringPool(strings) {
     $rt_stringPool_instance = new Array(strings.length);
     for (var i = 0; i < strings.length; ++i) {
         $rt_stringPool_instance[i] = $rt_intern($rt_str(strings[i]));
     }
 }
-function $rt_s(index) {
-    return $rt_stringPool_instance[index];
+function $rt_s(index1) {
+    if (typeof $rt_stringPool_instance === 'undefined') {
+        $rt_stringPool($rt_stringPool_args);
+        $rt_s = function(index2) {
+            return $rt_stringPool_instance[index2];
+        }
+    }
+    return $rt_stringPool_instance[index1];
 }
 function TeaVMThread(runner) {
     this.status = 3;

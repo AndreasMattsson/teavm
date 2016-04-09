@@ -219,7 +219,7 @@ public class Renderer implements ExprVisitor, StatementVisitor, RenderingContext
             return;
         }
         try {
-            writer.append("$rt_stringPool([");
+            writer.append("$rt_stringPoolArgs([");
             for (int i = 0; i < stringPool.size(); ++i) {
                 if (i > 0) {
                     writer.append(',').ws();
