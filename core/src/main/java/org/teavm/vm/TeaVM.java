@@ -36,6 +36,7 @@ import org.teavm.model.*;
 import org.teavm.model.instructions.*;
 import org.teavm.model.util.*;
 import org.teavm.optimization.*;
+import org.teavm.optimization.UnusedVariableElimination;
 import org.teavm.vm.spi.RendererListener;
 import org.teavm.vm.spi.TeaVMHost;
 import org.teavm.vm.spi.TeaVMPlugin;
