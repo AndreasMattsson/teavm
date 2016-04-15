@@ -454,6 +454,19 @@ function $rt_s(index1) {
     }
     return $rt_stringPool_instance[index1];
 }
+function $rt_lazy(object, name, get) {
+    Object.defineProperty(object, name, {
+        configurable: true,
+        get: function () {
+            var value = get.call(this);
+            Object.defineProperty(this, name, { value: value });
+            return value;
+        },
+	    set: function(value) {
+	        Object.defineProperty(this, name, { value: value });
+	    }
+    });
+}
 function TeaVMThread(runner) {
     this.status = 3;
     this.stack = [];

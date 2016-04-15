@@ -403,8 +403,12 @@ public class Renderer implements ExprVisitor, StatementVisitor, RenderingContext
                     value = getDefaultValue(field.getType());
                 }
                 FieldReference fieldRef = new FieldReference(cls.getName(), field.getName());
-                writer.appendClass(cls.getName()).append('.').appendField(fieldRef).ws().append("=").ws()
-                        .append(constantToString(value)).append(";").softNewLine();
+                writer.append("$rt_lazy(").appendClass(cls.getName()).append(',').ws()
+                        .append('\"').appendField(fieldRef).append("\",").ws()
+                        .append("function()").ws().append("{").ws().append("return ")
+                        .append(constantToString(value)).append(";").ws().append("}")
+                        .ws().append(");")
+                        .softNewLine();
             }
         } catch (NamingException e) {
             throw new RenderingException("Error rendering class " + cls.getName() + ". See cause for details", e);
