@@ -459,11 +459,11 @@ function $rt_lazy(object, name, get) {
         configurable: true,
         get: function () {
             var value = get.call(this);
-            Object.defineProperty(this, name, { value: value });
+            Object.defineProperty(this, name, { value: value, writable = true });
             return value;
         },
 	    set: function(value) {
-	        Object.defineProperty(this, name, { value: value });
+	        Object.defineProperty(this, name, { value: value, writable = true });
 	    }
     });
 }

@@ -399,16 +399,19 @@ public class Renderer implements ExprVisitor, StatementVisitor, RenderingContext
 
             for (FieldNode field : staticFields) {
                 Object value = field.getInitialValue();
+                FieldReference fieldRef = new FieldReference(cls.getName(), field.getName());
                 if (value == null) {
                     value = getDefaultValue(field.getType());
+                    writer.appendClass(cls.getName()).append('.').appendField(fieldRef).ws().append("=").ws()
+                            .append(constantToString(value)).append(";").softNewLine();					
+                } else {
+                    writer.append("$rt_lazy(").appendClass(cls.getName()).append(',').ws()
+                            .append('\"').appendField(fieldRef).append("\",").ws()
+                            .append("function()").ws().append("{").ws().append("return ")
+                            .append(constantToString(value)).append(";").ws().append("}")
+                            .ws().append(");")
+                            .softNewLine();
                 }
-                FieldReference fieldRef = new FieldReference(cls.getName(), field.getName());
-                writer.append("$rt_lazy(").appendClass(cls.getName()).append(',').ws()
-                        .append('\"').appendField(fieldRef).append("\",").ws()
-                        .append("function()").ws().append("{").ws().append("return ")
-                        .append(constantToString(value)).append(";").ws().append("}")
-                        .ws().append(");")
-                        .softNewLine();
             }
         } catch (NamingException e) {
             throw new RenderingException("Error rendering class " + cls.getName() + ". See cause for details", e);
